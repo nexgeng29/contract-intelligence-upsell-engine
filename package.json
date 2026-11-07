@@ -1,0 +1,14 @@
+{
+  "name": "contract-intelligence-upsell-engine",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev:frontend": "npm run dev --workspace frontend",
+    "start:backend": "npm run start --workspace backend",
+    "build": "npm run build --workspace frontend",
+    "test": "npm test --workspace backend"
+  }
+}
