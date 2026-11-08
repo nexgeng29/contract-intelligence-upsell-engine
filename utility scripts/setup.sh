@@ -48,14 +48,5 @@ echo "==> Deploying with Terraform"
   terraform init -input=false && \
   terraform apply -auto-approve -input=false)
 
-echo "==> Testing: uploading a file to S3"
-TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S)
-TEST_FILE="/tmp/test-$TIMESTAMP.txt"
-echo "hello" > $TEST_FILE
-aws --endpoint-url=$ENDPOINT s3 cp $TEST_FILE s3://contract-documents/temp/test-$TIMESTAMP.txt
-
-echo "==> Listing all files from S3"
-aws --endpoint-url=$ENDPOINT s3 ls s3://contract-documents/temp/ --recursive
-
 echo ""
 echo "==> Done"

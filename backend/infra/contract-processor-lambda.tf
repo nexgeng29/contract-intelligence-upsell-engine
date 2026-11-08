@@ -1,7 +1,7 @@
 data "archive_file" "contract_processor_lambda" {
   type        = "zip"
   source_dir  = "${path.module}/${var.contract_processor_lambda_dir}"
-  output_path = "${path.module}/build/lambda.zip"
+  output_path = "${path.module}/build/contract_processor_lambda.zip"
   excludes    = ["dist", "build.mjs"]
 }
 

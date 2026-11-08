@@ -57,3 +57,13 @@ variable "postgres_db" {
   default     = "contract_db"
 }
 
+variable "recommendation_lambda_dir" {
+  description = "Folder containing the built Node.js code"
+  type        = string
+  default     = "../src/recommendation-lambda"
+}
+
+variable "recommendation_function_name" {
+  type    = string
+  default = "recommendation"
+}
