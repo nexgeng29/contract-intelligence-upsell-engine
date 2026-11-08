@@ -1,0 +1,36 @@
+[
+  {
+    "productId": "PROD001",
+    "name": "Cash Management",
+    "category": "Core",
+    "description": "Centralised cash management solution",
+    "annualPrice": 12000,
+    "available": true,
+    "upgradeTo": ["PROD002"]
+  },
+  {
+    "productId": "PROD002",
+    "name": "Cash Management Premium",
+    "category": "Core",
+    "description": "Advanced cash management with premium capabilities",
+    "annualPrice": 20000,
+    "available": true,
+    "upgradeFrom": ["PROD001"]
+  },
+  {
+    "productId": "PROD003",
+    "name": "Cash Forecasting AI",
+    "category": "AI",
+    "description": "AI-powered cash flow forecasting",
+    "annualPrice": 18000,
+    "available": true
+  },
+  {
+    "productId": "PROD004",
+    "name": "Fraud Detection",
+    "category": "Security",
+    "description": "Transaction fraud detection and monitoring",
+    "annualPrice": 9000,
+    "available": true
+  }
+]

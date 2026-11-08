@@ -1,4 +1,13 @@
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.*
+**/build/
+crash.log
+
+# Node
 node_modules/
-dist/
-coverage/
+**/dist/
+
+# Secrets
 .env

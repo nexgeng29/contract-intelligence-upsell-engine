@@ -1,4 +1,5 @@
 # contract-intelligence-upsell-engine
+
 Contract intelligence platform that analyzes agreements to detect renewal signals, clause insights, and cross-sell/upsell opportunities
 
 ## Project structure
@@ -29,3 +30,6 @@ Run the frontend production build and backend tests with:
 npm run build
 npm test
 ```
+
+chmod +x setup.sh
+./setup.sh

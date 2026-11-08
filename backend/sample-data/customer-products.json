@@ -1,0 +1,23 @@
+[
+  {
+    "customerId": "CUST001",
+    "productId": "PROD001",
+    "package": "Standard",
+    "status": "ACTIVE",
+    "contractId": "CON001"
+  },
+  {
+    "customerId": "CUST001",
+    "productId": "PROD004",
+    "package": "Basic",
+    "status": "ACTIVE",
+    "contractId": "CON002"
+  },
+  {
+    "customerId": "CUST002",
+    "productId": "PROD001",
+    "package": "Standard",
+    "status": "ACTIVE",
+    "contractId": "CON003"
+  }
+]
