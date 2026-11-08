@@ -1,17 +1,17 @@
-data "archive_file" "lambda" {
+data "archive_file" "contract_processor_lambda" {
   type        = "zip"
-  source_dir  = "${path.module}/${var.lambda_dist_dir}"
+  source_dir  = "${path.module}/${var.contract_processor_lambda_dir}"
   output_path = "${path.module}/build/lambda.zip"
   excludes    = ["dist", "build.mjs"]
 }
 
 resource "aws_lambda_function" "processor" {
-  function_name    = var.function_name
+  function_name    = var.contract_processor_function_name
   role             = aws_iam_role.lambda.arn
   runtime          = "nodejs22.x"
   handler          = "index.handler"
-  filename         = data.archive_file.lambda.output_path
-  source_code_hash = data.archive_file.lambda.output_base64sha256
+  filename         = data.archive_file.contract_processor_lambda.output_path
+  source_code_hash = data.archive_file.contract_processor_lambda.output_base64sha256
   timeout          = 30
   memory_size      = 256
 
@@ -34,10 +34,10 @@ resource "aws_lambda_permission" "allow_s3" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.processor.function_name
   principal     = "s3.amazonaws.com"
-  source_arn    = "arn:aws:s3:::${var.bucket_name}"
+  source_arn    = "arn:aws:s3:::${aws_s3_bucket.contract_documents.bucket}"
 }
 resource "aws_iam_role" "lambda" {
-  name = "${var.function_name}-role"
+  name = "${var.contract_processor_function_name}-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -50,7 +50,7 @@ resource "aws_iam_role" "lambda" {
 }
 
 resource "aws_iam_role_policy" "lambda" {
-  name = "${var.function_name}-policy"
+  name = "${var.contract_processor_function_name}-policy"
   role = aws_iam_role.lambda.id
 
   policy = jsonencode({
@@ -59,7 +59,7 @@ resource "aws_iam_role_policy" "lambda" {
       {
         Effect   = "Allow"
         Action   = ["s3:GetObject"]
-        Resource = "${aws_s3_bucket.documents.arn}/*"
+        Resource = "${aws_s3_bucket.contract_documents.arn}/*"
       },
       {
         Effect   = "Allow"
@@ -71,6 +71,6 @@ resource "aws_iam_role_policy" "lambda" {
 }
 
 resource "aws_cloudwatch_log_group" "lambda" {
-  name              = "/aws/lambda/${var.function_name}"
+  name              = "/aws/lambda/${var.contract_processor_function_name}"
   retention_in_days = 7
 }

@@ -13,18 +13,18 @@ variable "aws_region" {
   default = "us-east-1"
 }
 
-variable "lambda_dist_dir" {
+variable "contract_processor_lambda_dir" {
   description = "Folder containing the built Node.js code"
   type        = string
-  default     = "../src"
+  default     = "../src/contract-processor-lambda"
 }
 
-variable "bucket_name" {
+variable "contract_documents_bucket" {
   type    = string
   default = "contract-documents"
 }
 
-variable "function_name" {
+variable "contract_processor_function_name" {
   type    = string
   default = "contract-processor"
 }
