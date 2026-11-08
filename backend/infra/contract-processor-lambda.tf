@@ -2,12 +2,13 @@ data "archive_file" "lambda" {
   type        = "zip"
   source_dir  = "${path.module}/${var.lambda_dist_dir}"
   output_path = "${path.module}/build/lambda.zip"
+  excludes    = ["dist", "build.mjs"]
 }
 
 resource "aws_lambda_function" "processor" {
   function_name    = var.function_name
   role             = aws_iam_role.lambda.arn
-  runtime          = "nodejs20.x"
+  runtime          = "nodejs22.x"
   handler          = "index.handler"
   filename         = data.archive_file.lambda.output_path
   source_code_hash = data.archive_file.lambda.output_base64sha256

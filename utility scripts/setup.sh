@@ -17,6 +17,11 @@ export AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY:-test}"
 export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
 ENDPOINT="${ENDPOINT:-http://localhost:4566}"
 
+# PostgreSQL variables (these will be passed to Terraform)
+POSTGRES_USER="${POSTGRES_USER:-postgres}"
+POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-password}"
+POSTGRES_DB="${POSTGRES_DB:-contract_db}"
+
 echo "==> Installing Terraform"
 if ! command -v terraform &> /dev/null; then
   brew tap hashicorp/tap
@@ -33,13 +38,13 @@ echo "==> Running database migrations"
 bash "$BACKEND_DIR/database/scripts/migrate.sh"
 
 echo "==> Building Lambda"
-(cd "$BACKEND_DIR/src" && npm install && npm run build)
+(cd "$BACKEND_DIR/src" && npm install)
 
 echo "==> Deploying with Terraform"
 (cd "$BACKEND_DIR/infra" && \
-  TF_VAR_postgres_user="$POSTGRES_USER" \
-  TF_VAR_postgres_password="$POSTGRES_PASSWORD" \
-  TF_VAR_postgres_db="$POSTGRES_DB" \
+  export TF_VAR_postgres_user="$POSTGRES_USER"
+  export TF_VAR_postgres_password="$POSTGRES_PASSWORD"
+  export TF_VAR_postgres_db="$POSTGRES_DB"
   terraform init -input=false && \
   terraform apply -auto-approve -input=false)
 

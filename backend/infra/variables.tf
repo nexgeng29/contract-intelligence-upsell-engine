@@ -16,7 +16,7 @@ variable "aws_region" {
 variable "lambda_dist_dir" {
   description = "Folder containing the built Node.js code"
   type        = string
-  default     = "../src/dist"
+  default     = "../src"
 }
 
 variable "bucket_name" {
@@ -48,7 +48,6 @@ variable "postgres_user" {
 variable "postgres_password" {
   description = "PostgreSQL password"
   type        = string
-  sensitive   = true
   default     = ""
 }
 
