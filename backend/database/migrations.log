@@ -1,4 +1,4 @@
 Logs saved to: /Users/hassan/contract-intelligence-upsell-engine/backend/database/scripts/../migrations.log
-[2026-11-09 23:04:22] Executing: 001-init.sql
-[2026-11-09 23:04:22] ✓ SUCCESS: 001-init.sql
+[2026-11-09 23:40:05] Executing: 001-init.sql
+[2026-11-09 23:40:05] ✓ SUCCESS: 001-init.sql
 ==> Database migrations completed
