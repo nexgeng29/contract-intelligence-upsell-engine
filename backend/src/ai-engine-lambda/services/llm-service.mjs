@@ -1,11 +1,11 @@
 export class LLMService {
   constructor() {
-    this.baseUrl = process.env.OLLAMA_BASE_URL || "http://localhost:11434";
-    this.model = process.env.LLM_MODEL || "neural-chat";
+    this.ollamaUrl = process.env.OLLAMA_URL;
+    this.model = process.env.LLM_MODEL;
   }
 
   async chat(messages, options = {}) {
-    const response = await fetch(`${this.baseUrl}/api/chat`, {
+    const response = await fetch(`${this.ollamaUrl}/api/chat`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -34,7 +34,8 @@ export class LLMService {
   }
 
   async generateJson(messages) {
-    const response = await fetch(`${this.baseUrl}/api/chat`, {
+    console.log("Generating JSON with messages:", messages);
+    const response = await fetch(`${this.ollamaUrl}/api/chat`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

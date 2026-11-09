@@ -19,11 +19,6 @@ export const handler = async (event) => {
       throw new Error("Missing required field: question");
     }
 
-    console.log("Processing contract query", {
-      customerId,
-      question,
-    });
-
     const result = await queryEngine.query(customerId, question);
 
     console.log("Contract query processed", {
