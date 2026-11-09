@@ -27,7 +27,6 @@ export class ContractQueryEngine {
     const dbStart = Date.now();
     const chunks = await this.repository.searchByEmbedding(
       customerId,
-      null,
       embedding,
       this.topK,
     );
@@ -38,10 +37,10 @@ export class ContractQueryEngine {
     );
 
     if (evidence.length === 0) {
+      const scope = customerId ? "customer's contracts" : "all contracts";
       console.log("No relevant evidence found for query");
       return {
-        answer:
-          "I could not find relevant information in the customer's contracts.",
+        answer: `I could not find relevant information in the ${scope}.`,
         evidence: [],
       };
     }
@@ -88,17 +87,13 @@ export class ContractQueryEngine {
   }
 
   async query(customerId, question) {
-    if (!customerId?.trim()) {
-      throw new Error("Customer ID is required");
-    }
-
     if (!question?.trim()) {
       throw new Error("Question is required");
     }
 
     const startTime = Date.now();
     console.log("Processing contract query", {
-      customerId,
+      customerId: customerId || "all-customers",
       question: question.substring(0, 100),
     });
 

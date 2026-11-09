@@ -11,10 +11,6 @@ export const handler = async (event) => {
   try {
     const { customerId, question } = event;
 
-    if (!customerId) {
-      throw new Error("Missing required field: customerId");
-    }
-
     if (!question) {
       throw new Error("Missing required field: question");
     }
@@ -22,8 +18,6 @@ export const handler = async (event) => {
     const result = await queryEngine.query(customerId, question);
 
     console.log("Contract query processed", {
-      intent: result.intent,
-      type: result.type,
       evidenceCount: result.evidence?.length || 0,
     });
 

@@ -54,7 +54,7 @@ export class DatabaseRepository {
 
     query += ` ORDER BY dc.embedding <=> $2::vector
        LIMIT $${paramIndex}`;
-    
+
     params.push(limit);
 
     const result = await this.pool.query(query, params);
@@ -113,16 +113,15 @@ export class DatabaseRepository {
     return result.rows;
   }
 
-  async searchByEmbedding(customerId, contractId, embedding, limit = 10) {
+  async searchByEmbedding(customerId, embedding, limit = 10) {
     console.log("Searching chunks by embedding similarity", {
-      customerId,
-      contractId,
+      customerId: customerId || "all-customers",
       limit,
     });
 
     const vector = `[${embedding.join(",")}]`;
-    const params = [customerId];
-    let paramIndex = 2;
+    const params = [];
+    let paramIndex = 1;
 
     let query = `SELECT 
         dc.id,
@@ -136,28 +135,28 @@ export class DatabaseRepository {
         (1 - (dc.embedding <=> $${paramIndex}::vector)) as similarity
        FROM document_chunks dc
        JOIN documents d ON dc.document_id = d.id
-       WHERE dc.customer_id = $1`;
+       WHERE 1=1`;
 
-    if (contractId) {
-      query += ` AND dc.contract_id = $${paramIndex + 1}`;
-      params.push(vector);
-      params.push(contractId);
-      paramIndex += 2;
-    } else {
-      params.push(vector);
+    paramIndex += 1;
+
+    if (customerId) {
+      query += ` AND dc.customer_id = $${paramIndex}`;
+      params.push(customerId);
       paramIndex += 1;
     }
 
-    query += ` ORDER BY dc.embedding <=> $2::vector
+    params.unshift(vector);
+    query += ` ORDER BY dc.embedding <=> $1::vector
        LIMIT $${paramIndex}`;
-    
+
     params.push(limit);
 
     const result = await this.pool.query(query, params);
 
     console.log("Found embedding matches", {
       count: result.rows.length,
-      fromContracts: contractId ? [contractId] : "all",
+      fromCustomers: customerId ? [customerId] : "all",
+      fromContracts: "all",
     });
 
     return result.rows;
