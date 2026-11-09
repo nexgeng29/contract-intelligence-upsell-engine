@@ -37,8 +37,14 @@ until curl -sf $ENDPOINT/_localstack/health >/dev/null 2>&1; do sleep 2; done
 echo "==> Running database migrations"
 bash "$BACKEND_DIR/database/scripts/migrate.sh"
 
-echo "==> Building Lambda"
-(cd "$BACKEND_DIR/src" && npm install)
+echo "==> Building Lambda functions"
+for dir in "$BACKEND_DIR/src"/*; do
+  if [ -d "$dir" ] && [ -f "$dir/package.json" ]; then
+    echo "   Installing dependencies in $(basename $dir)..."
+    (cd "$dir" && npm install)
+  fi
+done
+
 
 echo "==> Deploying with Terraform"
 (cd "$BACKEND_DIR/infra" && \

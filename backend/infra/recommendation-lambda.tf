@@ -7,7 +7,7 @@ data "archive_file" "recommendation_lambda_archieve" {
 
 resource "aws_lambda_function" "recommendation_lambda" {
   function_name    = var.recommendation_function_name
-  role             = aws_iam_role.lambda.arn
+  role             = aws_iam_role.recommendation_lambda_role.arn
   runtime          = "nodejs22.x"
   handler          = "index.handler"
   filename         = data.archive_file.recommendation_lambda_archieve.output_path
@@ -25,11 +25,11 @@ resource "aws_lambda_function" "recommendation_lambda" {
     }
   }
 
-  depends_on = [aws_cloudwatch_log_group.lambda]
+  depends_on = [aws_cloudwatch_log_group.recommendation_lambda]
 }
 
 
-resource "aws_iam_role" "lambda" {
+resource "aws_iam_role" "recommendation_lambda_role" {
   name = "${var.recommendation_function_name}-role"
 
   assume_role_policy = jsonencode({
@@ -42,9 +42,9 @@ resource "aws_iam_role" "lambda" {
   })
 }
 
-resource "aws_iam_role_policy" "lambda" {
+resource "aws_iam_role_policy" "recommendation_lambda_policy" {
   name = "${var.recommendation_function_name}-policy"
-  role = aws_iam_role.lambda.id
+  role = aws_iam_role.recommendation_lambda_role.id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -59,7 +59,7 @@ resource "aws_iam_role_policy" "lambda" {
   })
 }
 
-resource "aws_cloudwatch_log_group" "lambda" {
+resource "aws_cloudwatch_log_group" "recommendation_lambda" {
   name              = "/aws/lambda/${var.recommendation_function_name}"
   retention_in_days = 7
 }
