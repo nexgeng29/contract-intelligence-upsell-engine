@@ -16,38 +16,7 @@ export class ContractQueryEngine {
     this.minSimilarity = parseFloat(process.env.QUERY_MIN_SIMILARITY || "0.5");
   }
 
-  async classifyQuestion(question) {
-    const intent = await this.llmService.generateJson(
-      PromptBuilder.contractIntent(question),
-    );
-
-    const supportedIntents = [
-      "CONTRACT_EXPIRY",
-      "EXPIRED_CONTRACTS",
-      "CONTRACT_RENEWAL",
-      "AUTO_RENEWAL",
-      "TERMINATION_NOTICE",
-      "CONTRACT_SEARCH",
-      "CONTRACT_SUMMARY",
-      "GENERAL_CONTRACT_QUESTION",
-    ];
-
-    if (!supportedIntents.includes(intent.intent)) {
-      throw new Error("Unsupported contract query intent");
-    }
-
-    return intent;
-  }
-
-  validatePeriod(value) {
-    const period = Number(value ?? 90);
-
-    if (!Number.isInteger(period) || period < 1 || period > 3650) {
-      throw new Error("Invalid date search period");
-    }
-
-    return period;
-  }
+  async 
 
   async executeSemanticQuery(customerId, question) {
     const startTime = Date.now();
@@ -130,29 +99,21 @@ export class ContractQueryEngine {
       question: question.substring(0, 100),
     });
 
-    const classifyStart = Date.now();
-    const intent = await this.classifyQuestion(question);
-    const classifyTime = Date.now() - classifyStart;
-    console.log("Intent classified", { intent: intent.intent, duration: `${classifyTime}ms` });
-
     const semanticStart = Date.now();
     const semanticResult = await this.executeSemanticQuery(
       customerId,
-      intent.searchQuery || question,
+      question,
     );
     const semanticTime = Date.now() - semanticStart;
-    console.log("Semantic query completed", { duration: `${semanticTime}ms`, chunks: semanticResult.evidence?.length || 0 });
 
     const totalTime = Date.now() - startTime;
-    console.log("Query completed", { totalTime: `${totalTime}ms` });
+    console.log("Query completed", { totalTime: `${totalTime}ms`, semanticMs: semanticTime });
 
     return {
       customerId,
       question,
-      intent: intent.intent,
+      intent: "SEMANTIC_SEARCH",
       timing: {
-        classifyMs: classifyTime,
-        semanticMs: semanticTime,
         totalMs: totalTime,
       },
       ...semanticResult,

@@ -38,7 +38,7 @@ variable "embedding_model" {
 
 variable "llm_model" {
   type    = string
-  default = "qwen2.5:3b"
+  default = "qwen2.5:1.5b"
 }
 
 variable "ollama_url" {
