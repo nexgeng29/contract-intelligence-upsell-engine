@@ -8,6 +8,8 @@ variable "localstack_endpoint" {
   default = "http://localhost:4566"
 }
 
+
+
 variable "aws_region" {
   type    = string
   default = "us-east-1"
@@ -34,6 +36,11 @@ variable "embedding_model" {
   default = "nomic-embed-text"
 }
 
+variable "llm_model" {
+  type    = string
+  default = "qwen2.5:3b"
+}
+
 variable "ollama_url" {
   type    = string
   default = "http://host.docker.internal:11434"
@@ -57,13 +64,13 @@ variable "postgres_db" {
   default     = "contract_db"
 }
 
-variable "recommendation_lambda_dir" {
+variable "ai_engine_lambda_dir" {
   description = "Folder containing the built Node.js code"
   type        = string
-  default     = "../src/recommendation-lambda"
+  default     = "../src/ai-engine-lambda"
 }
 
-variable "recommendation_function_name" {
+variable "ai_engine_function_name" {
   type    = string
-  default = "recommendation"
+  default = "ai-engine"
 }

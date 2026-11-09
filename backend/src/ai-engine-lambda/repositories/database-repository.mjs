@@ -26,27 +26,40 @@ export class DatabaseRepository {
 
     const vector = `[${embedding.join(",")}]`;
 
-    const result = await this.pool.query(
-      `SELECT 
+    let query = `SELECT 
         dc.id,
         dc.document_id,
         dc.content,
         dc.page_number,
         dc.chunk_index,
+        dc.contract_id,
         d.file_name,
         d.object_key,
         (1 - (dc.embedding <=> $3::vector)) as similarity
        FROM document_chunks dc
        JOIN documents d ON dc.document_id = d.id
-       WHERE dc.customer_id = $1 
-         AND dc.contract_id = $2
-       ORDER BY dc.embedding <=> $3::vector
-       LIMIT $4`,
-      [customerId, contractId, vector, limit],
-    );
+       WHERE dc.customer_id = $1`;
+
+    const params = [customerId];
+
+    if (contractId) {
+      query += ` AND dc.contract_id = $2`;
+      params.push(contractId);
+      params.push(vector);
+      params.push(limit);
+    } else {
+      params.push(vector);
+      params.push(limit);
+    }
+
+    query += ` ORDER BY dc.embedding <=> $${params.length - 1}::vector
+       LIMIT $${params.length}`;
+
+    const result = await this.pool.query(query, params);
 
     console.log("Found similar chunks", {
       count: result.rows.length,
+      fromContracts: contractId ? [contractId] : "all",
     });
 
     return result.rows;
@@ -60,25 +73,41 @@ export class DatabaseRepository {
       limit,
     });
 
-    const result = await this.pool.query(
-      `SELECT 
+    let query = `SELECT 
         dc.id,
         dc.document_id,
         dc.content,
         dc.page_number,
         dc.chunk_index,
+        dc.contract_id,
         d.file_name,
         d.object_key
        FROM document_chunks dc
        JOIN documents d ON dc.document_id = d.id
-       WHERE dc.customer_id = $1 
-         AND dc.contract_id = $2
-         AND dc.content ILIKE $3
-       LIMIT $4`,
-      [customerId, contractId, `%${keyword}%`, limit],
-    );
+       WHERE dc.customer_id = $1`;
 
-    console.log("Found keyword matches", { count: result.rows.length });
+    const params = [customerId];
+
+    if (contractId) {
+      query += ` AND dc.contract_id = $2`;
+      params.push(contractId);
+      params.push(`%${keyword}%`);
+      params.push(limit);
+    } else {
+      params.push(`%${keyword}%`);
+      params.push(limit);
+    }
+
+    query += ` AND dc.content ILIKE $${contractId ? 3 : 2}
+       LIMIT $${contractId ? 4 : 3}`;
+
+    const result = await this.pool.query(query, params);
+
+    console.log("Found keyword matches", {
+      count: result.rows.length,
+      fromContracts: contractId ? [contractId] : "all",
+    });
+
     return result.rows;
   }
 
@@ -91,26 +120,42 @@ export class DatabaseRepository {
 
     const vector = `[${embedding.join(",")}]`;
 
-    const result = await this.pool.query(
-      `SELECT 
+    let query = `SELECT 
         dc.id,
         dc.document_id,
         dc.content,
         dc.page_number,
         dc.chunk_index,
+        dc.contract_id,
         d.file_name,
         d.object_key,
         (1 - (dc.embedding <=> $3::vector)) as similarity
        FROM document_chunks dc
        JOIN documents d ON dc.document_id = d.id
-       WHERE dc.customer_id = $1 
-         AND dc.contract_id = $2
-       ORDER BY dc.embedding <=> $3::vector
-       LIMIT $4`,
-      [customerId, contractId, vector, limit],
-    );
+       WHERE dc.customer_id = $1`;
 
-    console.log("Found embedding matches", { count: result.rows.length });
+    const params = [customerId];
+
+    if (contractId) {
+      query += ` AND dc.contract_id = $2`;
+      params.push(contractId);
+      params.push(vector);
+      params.push(limit);
+    } else {
+      params.push(vector);
+      params.push(limit);
+    }
+
+    query += ` ORDER BY dc.embedding <=> $${params.length - 1}::vector
+       LIMIT $${params.length}`;
+
+    const result = await this.pool.query(query, params);
+
+    console.log("Found embedding matches", {
+      count: result.rows.length,
+      fromContracts: contractId ? [contractId] : "all",
+    });
+
     return result.rows;
   }
 

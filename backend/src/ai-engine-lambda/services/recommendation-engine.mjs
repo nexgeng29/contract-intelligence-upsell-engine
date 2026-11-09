@@ -3,7 +3,7 @@ export class OllamaRAGEngine {
     this.embeddingService = embeddingService;
     this.databaseRepository = databaseRepository;
     this.ollamaUrl = process.env.OLLAMA_URL || "http://localhost:11434";
-    this.model = process.env.LLM_MODEL || "mistral";
+    this.model = process.env.LLM_MODEL;
   }
 
   async generateRAGRecommendations(
@@ -14,7 +14,7 @@ export class OllamaRAGEngine {
   ) {
     console.log("Generating Ollama RAG-based recommendations", {
       customerId,
-      contractId,
+      contractId: contractId || "all-contracts",
       model: this.model,
     });
 
@@ -28,7 +28,10 @@ export class OllamaRAGEngine {
       contractId,
     );
 
-    console.log("Retrieved RAG context", { chunks: retrievedContext.length });
+    console.log("Retrieved RAG context", {
+      chunks: retrievedContext.length,
+      fromContracts: contractId ? [contractId] : "all",
+    });
 
     if (retrievedContext.length === 0) {
       console.warn("No context found for RAG, using customer profile only");
@@ -46,7 +49,7 @@ export class OllamaRAGEngine {
 
     return {
       customerId,
-      contractId,
+      contractId: contractId || "all-customer-contracts",
       customer: customer.name,
       industry: customer.industry,
       segment: customer.segment,
@@ -214,7 +217,9 @@ Respond in this JSON format:
     const jsonMatch = responseText.match(/\{[\s\S]*?\n\}/);
 
     if (!jsonMatch) {
-      console.warn("Could not extract JSON from Ollama response, attempting raw parse");
+      console.warn(
+        "Could not extract JSON from Ollama response, attempting raw parse",
+      );
 
       try {
         const parsed = JSON.parse(responseText);
