@@ -7,6 +7,7 @@ export class EmbeddingService {
   }
 
   async generateEmbedding(text) {
+    const startTime = Date.now();
     console.log("Generating embedding for text", { length: text.length });
 
     const response = await fetch(`${this.ollamaUrl}/api/embed`, {
@@ -18,6 +19,8 @@ export class EmbeddingService {
       }),
       signal: AbortSignal.timeout(60000),
     });
+
+    const fetchTime = Date.now() - startTime;
 
     if (!response.ok) {
       const error = await response.text();
@@ -33,7 +36,8 @@ export class EmbeddingService {
       );
     }
 
-    console.log("Embedding generated", { dimension: embedding.length });
+    const totalTime = Date.now() - startTime;
+    console.log("Embedding generated", { dimension: embedding.length, fetchMs: fetchTime, totalMs: totalTime });
     return embedding;
   }
 

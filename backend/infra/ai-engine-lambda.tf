@@ -12,8 +12,8 @@ resource "aws_lambda_function" "ai_engine_lambda" {
   handler          = "index.handler"
   filename         = data.archive_file.ai_lambda_archieve.output_path
   source_code_hash = data.archive_file.ai_lambda_archieve.output_base64sha256
-  timeout          = 30
-  memory_size      = 256
+  timeout          = 120
+  memory_size      = 1024
 
   environment {
     variables = {

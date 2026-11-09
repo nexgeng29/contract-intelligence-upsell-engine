@@ -50,16 +50,21 @@ export class ContractQueryEngine {
   }
 
   async executeSemanticQuery(customerId, question) {
+    const startTime = Date.now();
     console.log("Executing semantic query", { customerId });
 
+    const embStart = Date.now();
     const embedding = await this.embeddingService.generateEmbedding(question);
+    const embTime = Date.now() - embStart;
 
+    const dbStart = Date.now();
     const chunks = await this.repository.searchByEmbedding(
       customerId,
       null,
       embedding,
       this.topK,
     );
+    const dbTime = Date.now() - dbStart;
 
     const evidence = chunks.filter(
       (item) => item.similarity >= this.minSimilarity,
@@ -75,8 +80,9 @@ export class ContractQueryEngine {
       };
     }
 
-    console.log("Found relevant evidence chunks", { count: evidence.length });
+    console.log("Found relevant evidence chunks", { count: evidence.length, embMs: embTime, dbMs: dbTime });
 
+    const llmStart = Date.now();
     const answer = await this.llmService.chat(
       PromptBuilder.answerFromEvidence(
         question,
@@ -88,6 +94,10 @@ export class ContractQueryEngine {
       ),
       { temperature: 0.1 },
     );
+    const llmTime = Date.now() - llmStart;
+
+    const totalTime = Date.now() - startTime;
+    console.log("Semantic search completed", { embMs: embTime, dbMs: dbTime, llmMs: llmTime, totalMs: totalTime });
 
     return {
       type: "SEMANTIC_SEARCH",
@@ -114,24 +124,37 @@ export class ContractQueryEngine {
       throw new Error("Question is required");
     }
 
+    const startTime = Date.now();
     console.log("Processing contract query", {
       customerId,
       question: question.substring(0, 100),
     });
 
+    const classifyStart = Date.now();
     const intent = await this.classifyQuestion(question);
+    const classifyTime = Date.now() - classifyStart;
+    console.log("Intent classified", { intent: intent.intent, duration: `${classifyTime}ms` });
 
-    console.log("Intent classified", { intent: intent.intent });
-
+    const semanticStart = Date.now();
     const semanticResult = await this.executeSemanticQuery(
       customerId,
       intent.searchQuery || question,
     );
+    const semanticTime = Date.now() - semanticStart;
+    console.log("Semantic query completed", { duration: `${semanticTime}ms`, chunks: semanticResult.evidence?.length || 0 });
+
+    const totalTime = Date.now() - startTime;
+    console.log("Query completed", { totalTime: `${totalTime}ms` });
 
     return {
       customerId,
       question,
       intent: intent.intent,
+      timing: {
+        classifyMs: classifyTime,
+        semanticMs: semanticTime,
+        totalMs: totalTime,
+      },
       ...semanticResult,
     };
   }

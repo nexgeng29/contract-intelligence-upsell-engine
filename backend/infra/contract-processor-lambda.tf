@@ -12,7 +12,7 @@ resource "aws_lambda_function" "processor" {
   handler          = "index.handler"
   filename         = data.archive_file.contract_processor_lambda.output_path
   source_code_hash = data.archive_file.contract_processor_lambda.output_base64sha256
-  timeout          = 30
+  timeout          = 300
   memory_size      = 256
 
   environment {

@@ -25,6 +25,8 @@ export class DatabaseRepository {
     });
 
     const vector = `[${embedding.join(",")}]`;
+    const params = [customerId];
+    let paramIndex = 2;
 
     let query = `SELECT 
         dc.id,
@@ -35,25 +37,25 @@ export class DatabaseRepository {
         dc.contract_id,
         d.file_name,
         d.object_key,
-        (1 - (dc.embedding <=> $3::vector)) as similarity
+        (1 - (dc.embedding <=> $${paramIndex}::vector)) as similarity
        FROM document_chunks dc
        JOIN documents d ON dc.document_id = d.id
        WHERE dc.customer_id = $1`;
 
-    const params = [customerId];
-
     if (contractId) {
-      query += ` AND dc.contract_id = $2`;
-      params.push(contractId);
+      query += ` AND dc.contract_id = $${paramIndex + 1}`;
       params.push(vector);
-      params.push(limit);
+      params.push(contractId);
+      paramIndex += 2;
     } else {
       params.push(vector);
-      params.push(limit);
+      paramIndex += 1;
     }
 
-    query += ` ORDER BY dc.embedding <=> $${params.length - 1}::vector
-       LIMIT $${params.length}`;
+    query += ` ORDER BY dc.embedding <=> $2::vector
+       LIMIT $${paramIndex}`;
+    
+    params.push(limit);
 
     const result = await this.pool.query(query, params);
 
@@ -119,6 +121,8 @@ export class DatabaseRepository {
     });
 
     const vector = `[${embedding.join(",")}]`;
+    const params = [customerId];
+    let paramIndex = 2;
 
     let query = `SELECT 
         dc.id,
@@ -129,25 +133,25 @@ export class DatabaseRepository {
         dc.contract_id,
         d.file_name,
         d.object_key,
-        (1 - (dc.embedding <=> $3::vector)) as similarity
+        (1 - (dc.embedding <=> $${paramIndex}::vector)) as similarity
        FROM document_chunks dc
        JOIN documents d ON dc.document_id = d.id
        WHERE dc.customer_id = $1`;
 
-    const params = [customerId];
-
     if (contractId) {
-      query += ` AND dc.contract_id = $2`;
-      params.push(contractId);
+      query += ` AND dc.contract_id = $${paramIndex + 1}`;
       params.push(vector);
-      params.push(limit);
+      params.push(contractId);
+      paramIndex += 2;
     } else {
       params.push(vector);
-      params.push(limit);
+      paramIndex += 1;
     }
 
-    query += ` ORDER BY dc.embedding <=> $${params.length - 1}::vector
-       LIMIT $${params.length}`;
+    query += ` ORDER BY dc.embedding <=> $2::vector
+       LIMIT $${paramIndex}`;
+    
+    params.push(limit);
 
     const result = await this.pool.query(query, params);
 
