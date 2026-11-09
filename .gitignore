@@ -12,3 +12,4 @@ node_modules/
 # Secrets
 .env
 backend/database/migrations.log
+utility scripts/**/*.json
