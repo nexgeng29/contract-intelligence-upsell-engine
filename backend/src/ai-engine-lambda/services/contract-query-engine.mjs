@@ -16,8 +16,6 @@ export class ContractQueryEngine {
     this.minSimilarity = parseFloat(process.env.QUERY_MIN_SIMILARITY || "0.5");
   }
 
-  async 
-
   async executeSemanticQuery(customerId, question) {
     const startTime = Date.now();
     console.log("Executing semantic query", { customerId });
@@ -42,14 +40,17 @@ export class ContractQueryEngine {
     if (evidence.length === 0) {
       console.log("No relevant evidence found for query");
       return {
-        type: "SEMANTIC_SEARCH",
         answer:
           "I could not find relevant information in the customer's contracts.",
         evidence: [],
       };
     }
 
-    console.log("Found relevant evidence chunks", { count: evidence.length, embMs: embTime, dbMs: dbTime });
+    console.log("Found relevant evidence chunks", {
+      count: evidence.length,
+      embMs: embTime,
+      dbMs: dbTime,
+    });
 
     const llmStart = Date.now();
     const answer = await this.llmService.chat(
@@ -61,15 +62,19 @@ export class ContractQueryEngine {
           content: item.content,
         })),
       ),
-      { temperature: 0.1 },
+      { temperature: 0.01 },
     );
     const llmTime = Date.now() - llmStart;
 
     const totalTime = Date.now() - startTime;
-    console.log("Semantic search completed", { embMs: embTime, dbMs: dbTime, llmMs: llmTime, totalMs: totalTime });
+    console.log("Semantic search completed", {
+      embMs: embTime,
+      dbMs: dbTime,
+      llmMs: llmTime,
+      totalMs: totalTime,
+    });
 
     return {
-      type: "SEMANTIC_SEARCH",
       answer,
       evidence: evidence.map((item) => ({
         chunkId: item.id,
@@ -78,8 +83,6 @@ export class ContractQueryEngine {
         fileName: item.file_name,
         pageNumber: item.page_number,
         chunkIndex: item.chunk_index,
-        similarity: item.similarity,
-        content: item.content,
       })),
     };
   }
@@ -107,7 +110,10 @@ export class ContractQueryEngine {
     const semanticTime = Date.now() - semanticStart;
 
     const totalTime = Date.now() - startTime;
-    console.log("Query completed", { totalTime: `${totalTime}ms`, semanticMs: semanticTime });
+    console.log("Query completed", {
+      totalTime: `${totalTime}ms`,
+      semanticMs: semanticTime,
+    });
 
     return {
       customerId,
